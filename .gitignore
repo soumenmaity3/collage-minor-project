@@ -1,0 +1,89 @@
+# Git Ignore for MedScan AI Project
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+# *.ipynb (keep notebook for reference, but exclude checkpoints)
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large Model Files (exclude from Git)
+*.pth
+*.h5
+*.pkl
+
+# Large Datasets (exclude from Git)
+brain_mri_extracted/
+nih_xray_extracted/
+BrainAndChestPedictor/brain_mri_extracted/
+BrainAndChestPedictor/nih_xray_extracted/
+BrainAndChestPedictor_code_only/
+*.zip
+
+# System
+*.zip
+*.rar
+Thumbs.db
+.DS_Store
+
+# Credentials (IMPORTANT - DO NOT COMMIT)
+kaggle.json
+.env
+*.key
+*.pem
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# OS
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes

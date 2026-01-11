@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning in TensorFlow - Complete Guide</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+            border-left: 4px solid #764ba2;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        .code-section {
+            margin: 25px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e0e0e0;
+        }
+        .code-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .code-title {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .code-badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        .code-badge.fine-tune {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .code-content {
+            background: #1e1e1e;
+            padding: 0;
+            overflow-x: auto;
+        }
+        .code-content pre {
+            margin: 0;
+            padding: 20px;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .code-content code {
+            display: block;
+        }
+        .keyword {
+            color: #569cd6;
+            font-weight: bold;
+        }
+        .string {
+            color: #ce9178;
+        }
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+        .number {
+            color: #b5cea8;
+        }
+        .function {
+            color: #dcdcaa;
+        }
+        .highlight {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        ul, ol {
+            line-height: 1.8;
+        }
+        p {
+            line-height: 1.8;
+            color: #333;
+        }
+        .step {
+            background: #f0f4ff;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="content">
+        <h1>Complete Guide to Fine-Tuning in TensorFlow</h1>
+        
+        <h2>1. What is Fine-Tuning?</h2>
+        <p>Fine-tuning is a transfer learning technique where you take a pre-trained model (trained on a large dataset) and adapt it to your specific task by training it on your custom dataset. Instead of training from scratch, you leverage the knowledge already learned by the model.</p>
+        
+        <div class="info-box">
+            <strong>Key Concept:</strong> Pre-trained models have already learned useful features from large datasets (like ImageNet with millions of images). Fine-tuning allows you to reuse these features for your specific problem.
+        </div>
+
+        <h2>2. Benefits of Fine-Tuning</h2>
+        <ul>
+            <li><strong>Faster Training:</strong> Requires less time compared to training from scratch</li>
+            <li><strong>Better Performance:</strong> Often achieves higher accuracy with less data</li>
+            <li><strong>Less Data Required:</strong> Works well even with smaller datasets</li>
+            <li><strong>Proven Features:</strong> Leverages features learned from millions of images</li>
+        </ul>
+
+        <h2>3. Fine-Tuning Process - Step by Step</h2>
+        
+        <div class="step">
+            <h3>Step 1: Load a Pre-trained Model</h3>
+            <p>Start with a model trained on a large dataset (e.g., VGG16, ResNet, MobileNet trained on ImageNet)</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Remove the Top Layer</h3>
+            <p>Remove the final classification layer since it's specific to the original task (e.g., 1000 ImageNet classes)</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Freeze Base Layers</h3>
+            <p>Initially freeze the pre-trained layers to preserve learned features</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Add Custom Layers</h3>
+            <p>Add new layers tailored to your specific classification task</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Train the New Layers</h3>
+            <p>Train only the new layers while keeping base layers frozen</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 6: Unfreeze and Fine-Tune</h3>
+            <p>Optionally unfreeze some base layers and train with a very low learning rate</p>
+        </div>
+
+        <h2>4. Code Example: Without Fine-Tuning</h2>
+        <p>Training a CNN from scratch without using pre-trained weights:</p>
+        
+        <div class="code-section">
+            <div class="code-header">
+                <span class="code-title">🔧 Training from Scratch - No Pre-trained Weights</span>
+                <span class="code-badge">Custom CNN</span>
+            </div>
+            <div class="code-content">
+<pre><code><span class="comment"># ========================================
+# IMPORT LIBRARIES
+# ========================================</span>
+<span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf
+<span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras
+<span class="keyword">from</span> tensorflow.keras <span class="keyword">import</span> layers
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># ========================================
+# STEP 1: LOAD AND PREPARE DATA
+# ========================================</span>
+<span class="comment"># Load CIFAR-10 dataset (32x32 color images, 10 classes)</span>
+(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+<span class="comment"># Normalize pixel values to [0, 1] range</span>
+x_train = x_train.astype(<span class="string">'float32'</span>) / <span class="number">255.0</span>
+x_test = x_test.astype(<span class="string">'float32'</span>) / <span class="number">255.0</span>
+
+<span class="comment"># Convert labels to one-hot encoding</span>
+y_train = keras.utils.to_categorical(y_train, <span class="number">10</span>)
+y_test = keras.utils.to_categorical(y_test, <span class="number">10</span>)
+
+<span class="function">print</span>(<span class="string">f"Training data shape: <span class="highlight">{x_train.shape}</span>"</span>)
+<span class="function">print</span>(<span class="string">f"Training labels shape: <span class="highlight">{y_train.shape}</span>"</span>)
+
+<span class="comment"># ========================================
+# STEP 2: BUILD MODEL FROM SCRATCH
+# ========================================</span>
+model_no_ft = keras.Sequential([
+    <span class="comment"># 🔷 First Convolutional Block</span>
+    layers.Conv2D(<span class="number">32</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, 
+                  input_shape=(<span class="number">32</span>, <span class="number">32</span>, <span class="number">3</span>), padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.Conv2D(<span class="number">32</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)),
+    layers.Dropout(<span class="number">0.25</span>),
+    
+    <span class="comment"># 🔶 Second Convolutional Block</span>
+    layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.Conv2D(<span class="number">64</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)),
+    layers.Dropout(<span class="number">0.25</span>),
+    
+    <span class="comment"># 🔸 Third Convolutional Block</span>
+    layers.Conv2D(<span class="number">128</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.Conv2D(<span class="number">128</span>, (<span class="number">3</span>, <span class="number">3</span>), activation=<span class="string">'relu'</span>, padding=<span class="string">'same'</span>),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>)),
+    layers.Dropout(<span class="number">0.25</span>),
+    
+    <span class="comment"># 🎯 Classification Head</span>
+    layers.Flatten(),
+    layers.Dense(<span class="number">256</span>, activation=<span class="string">'relu'</span>),
+    layers.BatchNormalization(),
+    layers.Dropout(<span class="number">0.5</span>),
+    layers.Dense(<span class="number">10</span>, activation=<span class="string">'softmax'</span>)
+])
+
+<span class="comment"># ========================================
+# STEP 3: COMPILE THE MODEL
+# ========================================</span>
+model_no_ft.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=<span class="number">0.001</span>),
+    loss=<span class="string">'categorical_crossentropy'</span>,
+    metrics=[<span class="string">'accuracy'</span>]
+)
+
+<span class="comment"># Display model architecture</span>
+model_no_ft.summary()
+
+<span class="comment"># ========================================
+# STEP 4: TRAIN THE MODEL
+# ========================================</span>
+<span class="function">print</span>(<span class="string">"\n<span class="highlight">═══ Training Model from Scratch ═══</span>"</span>)
+history_no_ft = model_no_ft.fit(
+    x_train, y_train,
+    batch_size=<span class="number">128</span>,
+    epochs=<span class="number">20</span>,
+    validation_split=<span class="number">0.2</span>,
+    verbose=<span class="number">1</span>
+)
+
+<span class="comment"># ========================================
+# STEP 5: EVALUATE PERFORMANCE
+# ========================================</span>
+test_loss, test_acc = model_no_ft.evaluate(x_test, y_test, verbose=<span class="number">0</span>)
+<span class="function">print</span>(<span class="string">f"\n✅ Test Accuracy: <span class="highlight">{test_acc:.4f}</span>"</span>)
+<span class="function">print</span>(<span class="string">f"📊 Test Loss: <span class="highlight">{test_loss:.4f}</span>"</span>)</code></pre>
+            </div>
+        </div>
+
+        <h2>5. Code Example: With Fine-Tuning</h2>
+        <p>Using a pre-trained model (MobileNetV2) and fine-tuning it for CIFAR-10:</p>
+        
+        <div class="code-section">
+            <div class="code-header">
+                <span class="code-title">🚀 Transfer Learning with Fine-Tuning</span>
+                <span class="code-badge fine-tune">MobileNetV2 + ImageNet</span>
+            </div>
+            <div class="code-content">
+<pre><code><span class="comment"># ========================================
+# IMPORT LIBRARIES
+# ========================================</span>
+<span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf
+<span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras
+<span class="keyword">from</span> tensorflow.keras <span class="keyword">import</span> layers
+<span class="keyword">from</span> tensorflow.keras.applications <span class="keyword">import</span> MobileNetV2
+
+<span class="comment"># ========================================
+# STEP 1: PREPARE DATA
+# ========================================</span>
+<span class="comment"># Load CIFAR-10 dataset</span>
+(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+<span class="comment"># Normalize pixel values</span>
+x_train = x_train.astype(<span class="string">'float32'</span>) / <span class="number">255.0</span>
+x_test = x_test.astype(<span class="string">'float32'</span>) / <span class="number">255.0</span>
+
+<span class="comment"># Convert to categorical</span>
+y_train = keras.utils.to_categorical(y_train, <span class="number">10</span>)
+y_test = keras.utils.to_categorical(y_test, <span class="number">10</span>)
+
+<span class="comment"># ========================================
+# STEP 2: CREATE DATA AUGMENTATION
+# ========================================</span>
+data_augmentation = keras.Sequential([
+    layers.RandomFlip(<span class="string">"horizontal"</span>),
+    layers.RandomRotation(<span class="number">0.1</span>),
+    layers.RandomZoom(<span class="number">0.1</span>),
+])
+
+<span class="comment"># ========================================
+# STEP 3: LOAD PRE-TRAINED BASE MODEL
+# ========================================</span>
+<span class="function">print</span>(<span class="string">"🔽 Loading MobileNetV2 with ImageNet weights..."</span>)
+
+base_model = MobileNetV2(
+    input_shape=(<span class="number">32</span>, <span class="number">32</span>, <span class="number">3</span>),
+    include_top=<span class="highlight">False</span>,      <span class="comment"># ❌ Remove classification layer</span>
+    weights=<span class="string">'imagenet'</span>       <span class="comment"># ✅ Use pre-trained weights</span>
+)
+
+<span class="comment"># ========================================
+# STEP 4: FREEZE BASE MODEL LAYERS
+# ========================================</span>
+base_model.trainable = <span class="highlight">False</span>  <span class="comment"># 🔒 Freeze all layers</span>
+
+<span class="function">print</span>(<span class="string">f"📊 Base model has <span class="highlight">{len(base_model.layers)}</span> layers"</span>)
+<span class="function">print</span>(<span class="string">f"🔒 Base model trainable: <span class="highlight">{base_model.trainable}</span>"</span>)
+
+<span class="comment"># ========================================
+# STEP 5: BUILD COMPLETE MODEL
+# ========================================</span>
+model_ft = keras.Sequential([
+    <span class="comment"># Data augmentation layer</span>
+    data_augmentation,
+    
+    <span class="comment"># Preprocess for MobileNetV2 (scale to [-1, 1])</span>
+    layers.Rescaling(scale=<span class="number">1.</span>/<span class="number">127.5</span>, offset=<span class="number">-1</span>),
+    
+    <span class="comment"># 🎯 Pre-trained base model (frozen)</span>
+    base_model,
+    
+    <span class="comment"># 🔧 Custom classification head</span>
+    layers.GlobalAveragePooling2D(),
+    layers.Dropout(<span class="number">0.3</span>),
+    layers.Dense(<span class="number">128</span>, activation=<span class="string">'relu'</span>),
+    layers.BatchNormalization(),
+    layers.Dropout(<span class="number">0.5</span>),
+    layers.Dense(<span class="number">10</span>, activation=<span class="string">'softmax'</span>)
+])
+
+<span class="comment"># ========================================
+# STEP 6: COMPILE MODEL (PHASE 1)
+# ========================================</span>
+model_ft.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=<span class="number">0.001</span>),
+    loss=<span class="string">'categorical_crossentropy'</span>,
+    metrics=[<span class="string">'accuracy'</span>]
+)
+
+model_ft.summary()
+
+<span class="comment"># ========================================
+# STEP 7: PHASE 1 - TRAIN TOP LAYERS ONLY
+# ========================================</span>
+<span class="function">print</span>(<span class="string">"\n<span class="highlight">╔════════════════════════════════════╗</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">║  PHASE 1: Train New Layers Only  ║</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">╚════════════════════════════════════╝</span>"</span>)
+
+history_phase1 = model_ft.fit(
+    x_train, y_train,
+    batch_size=<span class="number">128</span>,
+    epochs=<span class="number">10</span>,
+    validation_split=<span class="number">0.2</span>,
+    verbose=<span class="number">1</span>
+)
+
+<span class="comment"># ========================================
+# STEP 8: UNFREEZE BASE MODEL LAYERS
+# ========================================</span>
+<span class="function">print</span>(<span class="string">"\n<span class="highlight">╔════════════════════════════════════╗</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">║  PHASE 2: Fine-Tune Base Model   ║</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">╚════════════════════════════════════╝</span>"</span>)
+
+<span class="comment"># Unfreeze the base model</span>
+base_model.trainable = <span class="highlight">True</span>  <span class="comment"># 🔓 Unfreeze</span>
+
+<span class="comment"># Freeze all layers except the last 20</span>
+<span class="keyword">for</span> layer <span class="keyword">in</span> base_model.layers[:<span class="number">-20</span>]:
+    layer.trainable = <span class="highlight">False</span>
+
+trainable_count = <span class="function">len</span>([l <span class="keyword">for</span> l <span class="keyword">in</span> base_model.layers <span class="keyword">if</span> l.trainable])
+<span class="function">print</span>(<span class="string">f"🔓 Trainable layers: <span class="highlight">{trainable_count}</span>"</span>)
+
+<span class="comment"># ========================================
+# STEP 9: RECOMPILE WITH LOWER LR
+# ========================================</span>
+model_ft.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=<span class="number">0.0001</span>),  <span class="comment"># ⚡ 10x lower!</span>
+    loss=<span class="string">'categorical_crossentropy'</span>,
+    metrics=[<span class="string">'accuracy'</span>]
+)
+
+<span class="comment"># ========================================
+# STEP 10: FINE-TUNE THE MODEL
+# ========================================</span>
+history_phase2 = model_ft.fit(
+    x_train, y_train,
+    batch_size=<span class="number">128</span>,
+    epochs=<span class="number">10</span>,
+    validation_split=<span class="number">0.2</span>,
+    verbose=<span class="number">1</span>
+)
+
+<span class="comment"># ========================================
+# STEP 11: FINAL EVALUATION
+# ========================================</span>
+test_loss, test_acc = model_ft.evaluate(x_test, y_test, verbose=<span class="number">0</span>)
+
+<span class="function">print</span>(<span class="string">"\n<span class="highlight">╔════════════════════════════════════╗</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">║       FINAL RESULTS 🎉            ║</span>"</span>)
+<span class="function">print</span>(<span class="string">"<span class="highlight">╚════════════════════════════════════╝</span>"</span>)
+<span class="function">print</span>(<span class="string">f"✅ Test Accuracy: <span class="highlight">{test_acc:.4f}</span>"</span>)
+<span class="function">print</span>(<span class="string">f"📊 Test Loss: <span class="highlight">{test_loss:.4f}</span>"</span>)
+
+<span class="comment"># ========================================
+# STEP 12: COMPARE RESULTS
+# ========================================</span>
+<span class="function">print</span>(<span class="string">"\n<span class="highlight">═══════════════ COMPARISON ═══════════════</span>"</span>)
+<span class="function">print</span>(<span class="string">f"❌ Without Fine-Tuning: Acc = {test_acc_no_ft:.4f}"</span>)
+<span class="function">print</span>(<span class="string">f"✅ With Fine-Tuning:    Acc = {test_acc:.4f}"</span>)
+<span class="function">print</span>(<span class="string">f"📈 Improvement: +{(test_acc - test_acc_no_ft):.4f}"</span>)</code></pre>
+            </div>
+        </div>
+
+        <h2>6. Key Differences Explained</h2>
+        
+        <div class="comparison">
+            <div class="comparison-item">
+                <h3>Without Fine-Tuning</h3>
+                <ul>
+                    <li>Random weight initialization</li>
+                    <li>Trains all layers from scratch</li>
+                    <li>Requires more training time</li>
+                    <li>Needs more data for good performance</li>
+                    <li>Higher learning rate (0.001)</li>
+                    <li>Simple architecture</li>
+                </ul>
+            </div>
+            <div class="comparison-item">
+                <h3>With Fine-Tuning</h3>
+                <ul>
+                    <li>Pre-trained weight initialization</li>
+                    <li>Initially freezes base layers</li>
+                    <li>Faster convergence</li>
+                    <li>Works well with smaller datasets</li>
+                    <li>Lower learning rate (0.0001)</li>
+                    <li>Two-phase training strategy</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>7. Fine-Tuning Best Practices</h2>
+        
+        <div class="warning-box">
+            <strong>Important Tips:</strong>
+            <ol>
+                <li><strong>Use a lower learning rate:</strong> When fine-tuning, use 10-100x smaller learning rate to avoid destroying pre-trained weights</li>
+                <li><strong>Freeze layers strategically:</strong> Start with all layers frozen, then gradually unfreeze from top to bottom</li>
+                <li><strong>Train in phases:</strong> First train new layers, then fine-tune the entire model</li>
+                <li><strong>Monitor for overfitting:</strong> Fine-tuned models can overfit on small datasets</li>
+                <li><strong>Use data augmentation:</strong> Especially important with smaller datasets</li>
+            </ol>
+        </div>
+
+        <h2>8. Common Pre-trained Models in TensorFlow</h2>
+        <ul>
+            <li><strong>VGG16/VGG19:</strong> Simple architecture, good for learning</li>
+            <li><strong>ResNet50/ResNet101:</strong> Deeper networks with skip connections</li>
+            <li><strong>MobileNetV2:</strong> Lightweight, fast, mobile-friendly</li>
+            <li><strong>InceptionV3:</strong> Multi-scale feature extraction</li>
+            <li><strong>EfficientNet:</strong> State-of-the-art efficiency and accuracy</li>
+            <li><strong>DenseNet:</strong> Dense connections between layers</li>
+        </ul>
+
+        <h2>9. When to Use Fine-Tuning</h2>
+        
+        <div class="info-box">
+            <strong>Use Fine-Tuning When:</strong>
+            <ul>
+                <li>You have a small to medium-sized dataset (< 100k images)</li>
+                <li>Your task is similar to the pre-training task (e.g., image classification)</li>
+                <li>You want faster training and better performance</li>
+                <li>You have limited computational resources</li>
+            </ul>
+            
+            <strong>Train From Scratch When:</strong>
+            <ul>
+                <li>You have a very large dataset (millions of samples)</li>
+                <li>Your domain is very different from ImageNet (e.g., medical images, satellite imagery)</li>
+                <li>You need a custom architecture for specific requirements</li>
+            </ul>
+        </div>
+
+        <h2>10. Summary</h2>
+        <p>Fine-tuning is a powerful technique that allows you to leverage pre-trained models for your specific tasks. By starting with weights learned from millions of images, you can achieve better performance with less data and training time. The key is to freeze the base model initially, train your custom layers, and then optionally fine-tune some base layers with a very low learning rate.</p>
+
+        <button onclick="generatePDF()">Download as PDF</button>
+    </div>
+
+    <script>
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            const lineHeight = 7;
+            let yPos = margin;
+            
+            // Title
+            doc.setFontSize(20);
+            doc.setTextColor(102, 126, 234);
+            doc.text('Complete Guide to Fine-Tuning in TensorFlow', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 15;
+            
+            // Helper function to add new page if needed
+            function checkPageBreak(neededSpace = 10) {
+                if (yPos + neededSpace > pageHeight - margin) {
+                    doc.addPage();
+                    yPos = margin;
+                    return true;
+                }
+                return false;
+            }
+            
+            // Helper function to add section
+            function addSection(title, content, fontSize = 11) {
+                checkPageBreak(20);
+                doc.setFontSize(14);
+                doc.setTextColor(118, 75, 162);
+                doc.text(title, margin, yPos);
+                yPos += 8;
+                
+                doc.setFontSize(fontSize);
+                doc.setTextColor(51, 51, 51);
+                const lines = doc.splitTextToSize(content, pageWidth - 2 * margin);
+                lines.forEach(line => {
+                    checkPageBreak();
+                    doc.text(line, margin, yPos);
+                    yPos += lineHeight;
+                });
+                yPos += 5;
+            }
+            
+            // Add content
+            addSection('1. What is Fine-Tuning?', 
+                'Fine-tuning is a transfer learning technique where you take a pre-trained model (trained on a large dataset) and adapt it to your specific task by training it on your custom dataset. Instead of training from scratch, you leverage the knowledge already learned by the model.');
+            
+            addSection('2. Benefits of Fine-Tuning', 
+                '• Faster Training: Requires less time compared to training from scratch\n• Better Performance: Often achieves higher accuracy with less data\n• Less Data Required: Works well even with smaller datasets\n• Proven Features: Leverages features learned from millions of images');
+            
+            addSection('3. Fine-Tuning Process', 
+                'Step 1: Load a pre-trained model\nStep 2: Remove the top classification layer\nStep 3: Freeze base layers to preserve learned features\nStep 4: Add custom layers for your task\nStep 5: Train only the new layers\nStep 6: Optionally unfreeze and fine-tune with low learning rate');
+            
+            checkPageBreak(40);
+            doc.setFontSize(14);
+            doc.setTextColor(118, 75, 162);
+            doc.text('4. Code Example: Without Fine-Tuning', margin, yPos);
+            yPos += 8;
+            
+            doc.setFontSize(9);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'mono');
+            const code1 = `# Training from scratch
+model = keras.Sequential([
+    layers.Conv2D(32, (3,3), activation='relu'),
+    layers.MaxPooling2D((2,2)),
+    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(10, activation='softmax')
+])
+model.compile(optimizer='adam', loss='categorical_crossentropy')
+model.fit(x_train, y_train, epochs=20)`;
+            
+            const codeLines1 = code1.split('\n');
+            codeLines1.forEach(line => {
+                checkPageBreak();
+                doc.text(line, margin + 2, yPos);
+                yPos += 5;
+            });
+            
+            yPos += 10;
+            checkPageBreak(40);
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(14);
+            doc.setTextColor(118, 75, 162);
+            doc.text('5. Code Example: With Fine-Tuning', margin, yPos);
+            yPos += 8;
+            
+            doc.setFontSize(9);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'mono');
+            const code2 = `# Using pre-trained model
+base_model = MobileNetV2(include_top=False, weights='imagenet')
+base_model.trainable = False  # Freeze base layers
+
+model = keras.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(10, activation='softmax')
+])
+model.compile(optimizer=Adam(lr=0.001))
+model.fit(x_train, y_train, epochs=10)
+
+# Fine-tune
+base_model.trainable = True
+model.compile(optimizer=Adam(lr=0.0001))  # Lower LR
+model.fit(x_train, y_train, epochs=10)`;
+            
+            const codeLines2 = code2.split('\n');
+            codeLines2.forEach(line => {
+                checkPageBreak();
+                doc.text(line, margin + 2, yPos);
+                yPos += 5;
+            });
+            
+            doc.setFont(undefined, 'normal');
+            yPos += 10;
+            
+            addSection('6. Best Practices', 
+                '• Use 10-100x smaller learning rate when fine-tuning\n• Start with frozen layers, then unfreeze gradually\n• Train in two phases: new layers first, then fine-tune\n• Monitor for overfitting on small datasets\n• Use data augmentation\n• Choose appropriate pre-trained model for your task', 10);
+            
+            addSection('7. Common Pre-trained Models', 
+                'VGG16/VGG19, ResNet50, MobileNetV2, InceptionV3, EfficientNet, DenseNet', 10);
+            
+            addSection('When to Use Fine-Tuning', 
+                'Use when you have small-medium datasets, similar tasks to pre-training, or limited resources. Train from scratch when you have millions of samples or very different domains.', 10);
+            
+            // Save the PDF
+            doc.save('Fine-Tuning_Guide_TensorFlow.pdf');
+        }
+    </script>
+</body>
+</html>
